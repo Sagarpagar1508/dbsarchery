@@ -1,0 +1,74 @@
+<div class="container">
+  <h1 class="text-center pt-5"><b>CONTACT US</b></h1>
+  <!-- Page heading -->
+  <div class="row mb-4">
+
+    <div class="col-sm-12 col-md-5 col-lg-5">
+<p class="" style="font-size: 60px; font-weight: 500; margin-top: 20%; "> <span style="color: #82ad25;">Get in touch</span> <br> With us..</p>
+    </div>
+
+    <div class="col-sm-12 col-md-7 col-lg-7 text-center p-5" style="box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+
+      <!-- Get User Information -->
+      <form [formGroup]="form" (ngSubmit)="send()">
+        <div class="row">
+          <div class="col-lg-6 mb-3">
+            <label for="from_name">Your Name</label>
+            <input formControlName="from_name" name="from_name" type="text"
+              class="form-control" id="from_name" placeholder>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <label for="from_email">Email address</label>
+            <input formControlName="from_email" name="from_email" type="email"
+              class="form-control" id="from_email" placeholder>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <label for="subject">Subject</label>
+            <input formControlName="subject" name="subject" type="text"
+              class="form-control" id="subject" placeholder>
+          </div>
+          <div class="col-lg-6 mb-3">
+            <label for="controlInput">Query</label>
+            <select formControlName="query" class="form-select"
+              id="controlInput" aria-label="Large select example">
+              <option selected>Select Your Query</option>
+              <option value="Enquiry">Enquiry</option>
+              <option value="Trainer">Trainer</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="message">Write Message</label>
+            <textarea formControlName="message" name="message"
+              class="form-control" id="message" placeholder
+              style="height: 100px;"></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <button type="submit" class="btn btn-warning p-2">Send
+              Message</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Address -->
+  <div class="row">
+    <div class="col-lg-6 mb-4">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3717.9148604087404!2d77.51187817409512!3d21.274837480436766!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd6f39e6c54904d%3A0x49dbb036894cd61!2sGurukul%20Public%20School%20And%20College!5e0!3m2!1sen!2sin!4v1721132077541!5m2!1sen!2sin"
+        width="100%" height="450" style="border:0;" allowfullscreen
+        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <div class="col-lg-6 mb-4">
+      <h2 class="fw-bold">Contact Locations</h2>
+      <ul class="contact-info">
+        <li><i class="fa-solid fa-location-dot"></i> Gurukul public school
+          Paratwada, Achalpur, Amravati, Maharashtra-444805</li>
+        <li><i class="fa-solid fa-envelope"></i> sameerm25884@gmail.com</li>
+        <li><i class="fa-solid fa-phone"></i> 9545916988</li>
+      </ul>
+    </div>
+  </div>
+</div>

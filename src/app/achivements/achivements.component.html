@@ -1,0 +1,158 @@
+
+<div class="container-fluid px-5">
+
+  <!-- International -->
+  <div class="text-center my-3 p-4">
+    <h1>ACHIVEMENTS</h1>
+  </div>
+  <!-- international -->
+
+  <h2 class="p-2 fw-bold">International player</h2>
+  <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-4 g-4">
+    
+    <div class="col">
+      <div class="card h-100 border">
+        <img src="../../assets/Shukmani_inter.jpg" class="card-img-top"
+          alt="..."
+          style="height: 200px; width: 100%; object-fit: cover; object-position: 100% 0;">
+        <div class="card-body ">
+          <h5 class="card-title">Shukmani Gajanan Babarekar</h5>
+          <p class="card-text">Honored Chhatrapati Award</p>
+
+          <button routerLink="/shukmani" class="btn button">Read More</button>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <img src="../../assets/Sumedh_international.jpg" class="card-img-top"
+          alt="..."
+          style="height: 200px; width: 100%; object-fit: cover; object-position: 100% 0;">
+        <div class="card-body">
+          <h5 class="card-title">Sumedh Vijay Mohod</h5>
+          <p class="card-text">3rd South Asian Champion</p>
+          <button  routerLink="/sumedh" class="btn button">Read More</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100">
+        <img src="../../assets/yashdeep_inter.jpg" class="card-img-top"
+          alt="..."
+          style="height: 200px; width: 100%; object-fit: cover; object-position: 100% 0;">
+        <div class="card-body">
+          <h5 class="card-title">Yashdeep Sanjay Bhoge</h5>
+          <p class="card-text">Asia Cup</p>
+          <button routerLink="/yashdeep" class="btn button">Read More</button>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <img src="../../assets/Tisha_inter.jpg" class="card-img-top" alt="..."
+          style="height: 200px; width: 100%;  object-fit: cover; object-position: 100% 0; ">
+        <div class="card-body">
+          <h5 class="card-title">Tisha Kamlesh Sancheti</h5>
+          <p class="card-text">3rd South Asian Champion</p>
+          <button routerLink="/tisha" class="btn button">Read More</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- national player -->
+
+
+<div class="row pb-5 mt-4 ">
+  <div class="d-flex align-items-center justify-content-between">
+    <h3 class="fw-bold">National Players</h3>
+    <div class="text-center d-flex gap-3">
+      <button (click)="prevPage()" class="btn btn-primary" [disabled]="currentPage === 0">
+        <i class="fa-solid fa-circle-chevron-left"></i>
+      </button>
+      <button (click)="nextPage()" class="btn btn-primary"
+        [disabled]="(currentPage + 1) * pageSize >= players.length">
+        <i class="fa-solid fa-circle-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 mt-3">
+    <div *ngFor="let player of currentPlayers " class="col mb-3">
+      <div class="card h-100">
+        <img src="../../assets/placeholder.png" class="card-img-top" alt="..."
+          style="height: 200px; width: 100%; object-fit: cover; object-position: 100% 0;">
+        <div class="card-body">
+          <p class="card-title">{{player.name}}</p>
+          <p class="card-text">{{player.achievements}}</p>
+          <button [routerLink]="player.link" class="btn button rounded-pill">READ MORE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  <!-- state player -->
+<h2 class="fw-bold">State Player</h2>
+  <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-4 mt-3">
+    <div class="col mb-3">
+      <div class="card h-100">
+        <img src="../../assets/placeholder.png" class="card-img-top"
+          alt="..."
+          style="height: 200px; width: 100%; object-fit: cover; object-position: 100% 0;">
+        <div class="card-body ">
+          <h5 class="card-title">Anshul Vijay Mohod</h5>
+          <p class="card-text">1 Gold</p>
+
+          <button routerLink="/anshul" class="btn button">Read More</button>
+        </div>
+      </div>
+    </div>
+    <div class="col mb-3">
+      <div class="card h-100">
+        <img src="../../assets/placeholder.png" class="card-img-top"
+          alt="..."
+          style="height: 200px; width: 100%; object-fit: cover; object-position: 100% 0;">
+        <div class="card-body">
+          <h5 class="card-title">Prashik Madan Sadanshiv</h5>
+          <p class="card-text">1 Gold</p>
+          <button routerLink="/prashik" class="btn button">Read More</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col mb-3">
+      <div class="card h-100">
+        <img src="../../assets/placeholder.png" class="card-img-top"
+          alt="..."
+          style="height: 200px; width: 100%; object-fit: cover; object-position: 100% 0;">
+        <div class="card-body">
+          <h5 class="card-title">Ayush Sandip Kadu</h5>
+          <p class="card-text">1 Gold</p>
+          <button routerLink="/ayush" class="btn button">Read More</button>
+        </div>
+      </div>
+    </div>
+    <div class="col mb-3">
+      <div class="card h-100">
+        <img src="../../assets/placeholder.png" class="card-img-top" alt="..."
+          style="height: 200px; width: 100%;  object-fit: cover; object-position: 100% 0; ">
+        <div class="card-body">
+          <h5 class="card-title">Mansi Avinash Charhate</h5>
+          <p class="card-text">1 Gold</p>
+          <button routerLink="/mansi" class="btn button">Read More</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+</div>
+

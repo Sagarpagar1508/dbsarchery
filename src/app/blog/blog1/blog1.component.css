@@ -1,0 +1,10 @@
+@media only screen and (max-width: 600px) {
+        .mobile-view{
+            margin-top: 16%;
+        }
+
+}
+
+p, li{
+    text-align: justify;
+}

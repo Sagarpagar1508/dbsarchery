@@ -1,0 +1,1637 @@
+//add simple lazyload support for background images:
+document.addEventListener("lazybeforeunveil", function (e) {
+  var bg = e.target.getAttribute("data-bg");
+  if (bg) {
+    e.target.style.backgroundImage = "url(" + bg + ")";
+  }
+});
+
+var map;
+var markers = [];
+var infoWindow;
+var locationSelect;
+var postcodelatlng;
+
+//*-*-*-*-*-*-*-*-*-*-*-*
+//  START OF DOM READY
+//*-*-*-*-*-*-*-*-*-*-*-*
+$(document).ready(function () {
+  $(document).on("click", ".menuToggle", function (e) {
+    e.preventDefault();
+    toggleNav();
+  });
+
+  $(document).on("click", ".overlayNav li a.expands", function (e) {
+    e.preventDefault();
+    $(this).next(".subNav").addClass("open");
+  });
+
+  $(document).on("click", "a.minimise", function (e) {
+    e.preventDefault();
+    $(".subNav.open").removeClass("open");
+  });
+
+  $(document).on("click", "a.closeOverlayNav", function (e) {
+    e.preventDefault();
+    $(".subNav.open").removeClass("open");
+    $(".overlayNav.open").removeClass("open");
+  });
+
+  if ($("#instafeed").length) {
+    // The Url from your Authorisations list
+    var instantTokenApiUrl =
+      "https://ig.instant-tokens.com/users/26bfe6a3-e646-4de0-8f1c-ad3567209055/instagram/17841403497129804/token?userSecret=09pjo7ojnhsfrefvub8kncp";
+
+    $.ajax({
+      url: instantTokenApiUrl,
+      dataType: "json",
+    }).done(function (response) {
+      if (!response.Token) {
+        console.log("Error :: ", response);
+      } else {
+        var feed = new Instafeed({
+          accessToken: response.Token,
+          limit: 6,
+        });
+        feed.run();
+      }
+    });
+  }
+
+  checkCookies();
+
+  //cookie button
+  $(document).on("click", ".cookieButton a", function (e) {
+    e.preventDefault();
+    $(".cookieBar").removeClass("show");
+    createCookie("cookiecookie", "on", 30);
+  });
+
+  var homeSlideshow = $(".homeSlideshow").slick({
+    slidesToShow: 1,
+    dots: false,
+    arrows: false,
+    infinite: true,
+    fade: true,
+  });
+
+  $(document).on("click", ".homeHero .arrow.prev", function (e) {
+    e.preventDefault();
+    homeSlideshow.slick("slickPrev");
+    startProgressbar();
+  });
+
+  $(document).on("click", ".homeHero .arrow.next", function (e) {
+    e.preventDefault();
+    homeSlideshow.slick("slickNext");
+    startProgressbar();
+  });
+
+  homeSlideshow.on("swipe", function (event, slick, direction) {
+    startProgressbar();
+  });
+
+  var time = 2;
+  var $bar,
+    isPause = false,
+    tick,
+    percentTime;
+
+  $bar = $(".slider-progress .progress");
+
+  function startProgressbar() {
+    resetProgressbar();
+    percentTime = 0;
+    //isPause = false;
+    tick = setInterval(interval, 30);
+  }
+
+  function interval() {
+    if (isPause === false) {
+      percentTime += 1 / (time + 0.1);
+      $bar.css({
+        width: percentTime + "%",
+      });
+      if (percentTime >= 100) {
+        homeSlideshow.slick("slickNext");
+        startProgressbar();
+      }
+    }
+  }
+
+  function resetProgressbar() {
+    $bar.css({
+      width: 0 + "%",
+    });
+    clearTimeout(tick);
+  }
+
+  /*$(".homeSlideshow").hover(
+    function () {
+      isPause = true;
+      //console.log('hovering');
+    },
+    function () {
+      isPause = false; //change me back
+      //console.log('not hovering');
+    }
+  );*/
+
+  startProgressbar();
+
+  var homeNewsSlideshow = $(".homeNewsSlideshow").slick({
+    slidesToShow: 3,
+    arrows: false,
+    fade: false,
+    inifite: true,
+    autoplay: false,
+    speed: 300,
+    dots: false,
+    draggable: false,
+    responsive: [
+      {
+        breakpoint: 1500,
+        settings: {
+          slidesToShow: 3,
+        },
+      },
+      {
+        breakpoint: 1100,
+        settings: {
+          slidesToShow: 2,
+        },
+      },
+      {
+        breakpoint: 760,
+        settings: {
+          slidesToShow: 1,
+          draggable: true,
+        },
+      },
+    ],
+  });
+
+  var $progressBar = $(".homeNewsProgress");
+
+  homeNewsSlideshow.on(
+    "beforeChange",
+    function (event, slick, currentSlide, nextSlide) {
+      var calc = (nextSlide / (slick.slideCount - 1)) * 100;
+
+      $progressBar
+        .css("background-size", calc + "% 100%")
+        .attr("aria-valuenow", calc);
+    }
+  );
+
+  $(document).on("click", ".homeNewsSection .arrow.prev", function (e) {
+    e.preventDefault();
+    homeNewsSlideshow.slick("slickPrev");
+  });
+
+  $(document).on("click", ".homeNewsSection .arrow.next", function (e) {
+    e.preventDefault();
+    homeNewsSlideshow.slick("slickNext");
+  });
+
+  var typeSlideshow = $(".typeSlideshow").slick({
+    slidesToShow: 1,
+    dots: false,
+    arrows: false,
+    infinite: true,
+    fade: true,
+    speed: 600,
+  });
+
+  $(document).on("click", ".typeControls .arrow.prev", function (e) {
+    e.preventDefault();
+    typeSlideshow.slick("slickPrev");
+  });
+
+  $(document).on("click", ".typeControls .arrow.next", function (e) {
+    e.preventDefault();
+    typeSlideshow.slick("slickNext");
+  });
+
+  $(".typeNav").click(function (e) {
+    e.preventDefault();
+    $(".typeNav").removeClass("active");
+    $(this).addClass("active");
+    var slideno = $(this).data("slide");
+    typeSlideshow.slick("slickGoTo", slideno - 1);
+  });
+
+  /*$(".typeSlideshow").on("afterChange", function (e, s, currentSlideIndex) {
+    let currentSlide = currentSlideIndex + 1;
+    console.log(currentSlide);
+    //$(".typeNav").removeClass("active");
+    //$('.typeNav[data-slide="' + currentSlide + '"]').addClass("active");
+  });*/
+
+  $(".partnerSlider").slick({
+    dots: true,
+    arrows: true,
+    prevArrow:
+      '<button type="button" class="slick-prev"><img src="../images/icons/arrow-left-red.svg" alt="Previous Arrow Icon" /></button>',
+    nextArrow:
+      '<button type="button" class="slick-next"><img src="../images/icons/arrow-right-red.svg" alt="Next Arrow Icon" /></button>',
+    slidesToShow: 6,
+    slidesToScroll: 6,
+    speed: 1500,
+    infinite: true,
+    autoplay: true,
+    lazyLoad: "progressive",
+    responsive: [
+      {
+        breakpoint: 900,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 3,
+        },
+      },
+    ],
+  });
+
+  $(".bottomHomeAds").slick({
+    dots: false,
+    arrows: false,
+    slidesToShow: 3,
+    speed: 2000,
+    infinite: true,
+    autoplay: true,
+    cssEase: "linear",
+    pauseOnHover: false,
+    responsive: [
+      {
+        breakpoint: 900,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          fade: true,
+        },
+      },
+    ],
+  });
+
+  //resources
+  $(document).on("change", "select#category", function () {
+    var val = $("select#category").val();
+    var select = $("select#subcategory");
+
+    if (val == "") {
+      select.html("");
+      select.html(
+        '<option class="label" value="">Choose Sub Category</option>'
+      );
+      select.prop("disabled", true);
+    } else {
+      url = "../php/ajax/getResourceSubCategories.php?parent_url=" + val;
+      url = encodeURI(url);
+
+      $.get(url, function (data) {
+        select.html("");
+        select.html(data);
+        select.prop("disabled", false);
+        /*history.replaceState(
+          "",
+          "AGB Document & Policy Finder",
+          "/resources/document-finder/" + val
+        );*/
+      });
+    }
+  });
+
+  $(document).on("submit", "#resource_search", function (e) {
+    e.preventDefault();
+    $("#filter_resources").trigger("click");
+  });
+
+  $(document).on("click", ".filterResources", function (e) {
+    e.preventDefault();
+    var keyword = $("#keyword").val();
+    var category = $("select#category").val();
+    var subcategory = $("select#subcategory").val();
+    //alert(keyword);
+
+    if (category == "" && keyword == "") {
+      $("#resource_results").html(
+        '<tr class="titleRow"><td class="searchTitle" colspan="6"><h1>Please enter a keyword or select a category.</h1></td></tr>'
+      );
+    } else {
+      url =
+        "../php/ajax/filterResources.php?category=" +
+        category +
+        "&subcategory=" +
+        subcategory +
+        "&keyword=" +
+        keyword;
+      url = encodeURI(url);
+
+      if (category != "") {
+        history.replaceState(
+          "",
+          "Find a Document | Archery GB",
+          "/resources/find-a-document/" + category + "/" + subcategory
+        );
+      }
+      //console.log(url);
+
+      $.get(url, function (data) {
+        $("#resource_results").html(data);
+      });
+    }
+  });
+
+  //rounds filter for records
+  $(document).on("change", "#page_records select#type", function () {
+    var val = $("select#type").val();
+    var select = $("select#round_type");
+
+    if (val == "") {
+      select.html("");
+      select.html('<option value="">Round</option>');
+      select.prop("disabled", true);
+    } else {
+      url = "../php/ajax/getRounds.php?type=" + val;
+      url = encodeURI(url);
+
+      $.get(url, function (data) {
+        select.html("");
+        select.html(data);
+        select.prop("disabled", false);
+      });
+    }
+  });
+
+  $(document).on("click", ".filterRecords", function (e) {
+    e.preventDefault();
+    var type = $("select#type").val();
+    var round_type = $("select#round_type").val();
+    var bowstyle = $("select#bowstyle").val();
+    var age_group = $("select#age_group").val();
+    //alert(keyword);
+
+    if (type == "" && bowstyle == "" && age_group == "") {
+      $("#records_results").html("<h2>Please select a filter.</h2>");
+    } else {
+      url =
+        "../php/ajax/filterRecords.php?type=" +
+        type +
+        "&round_type=" +
+        round_type +
+        "&bowstyle=" +
+        bowstyle +
+        "&age_group=" +
+        age_group;
+      url = encodeURI(url);
+
+      //console.log(url);
+
+      $.get(url, function (data) {
+        $("#records_results").html(data);
+      });
+    }
+  });
+
+  $(document).on(
+    "click",
+    "#event_signup_form .gdprWrapper label",
+    function (e) {
+      $("#event_signup_form .gdprWrapper label").toggleClass("active");
+    }
+  );
+
+  //contact
+  $(document).on("submit", "#contact_form", function (e) {
+    e.preventDefault();
+    var valid = true;
+
+    var email = $("#contact_form #email").val();
+    var full_name = $("#contact_form #full_name").val();
+    var telephone = $("#contact_form #telephone").val();
+    var message = $("#contact_form #message").val();
+    var recaptcha_response = $("#recaptchaResponse").val();
+
+    if (!isEmail(email)) {
+      $("#contact_form .formResponse").html("Please enter a valid email.");
+      valid = false;
+      return;
+    }
+
+    if (full_name == "" || telephone == "" || message == "") {
+      $("#contact_form .formResponse").html(
+        "Please fill in the required fields."
+      );
+      valid = false;
+      return;
+    }
+
+    if (valid) {
+      $("#contact_form button").prop("disabled", true);
+
+      url = "../php/ajax/sendContactForm.php";
+      url = encodeURI(url);
+
+      post_data = {
+        email: email,
+        full_name: full_name,
+        telephone: telephone,
+        message: message,
+        recaptcha_response: recaptcha_response,
+      };
+
+      $.post(url, post_data, function (data) {
+        if (data == "success") {
+          $("#contact_form")[0].reset();
+          $("#contact_form .formResponse").html("Thank you for your enquiry.");
+          $("#contact_form .formResponse").addClass("success");
+          $("#contact_form button").prop("disabled", false);
+        } else {
+          $("#contact_form .formResponse").html(data);
+          $("#contact_form button").prop("disabled", false);
+        }
+      });
+    }
+  });
+
+  //concern form
+  $(document).on("submit", "#report_concern_form", function (e) {
+    e.preventDefault();
+    var valid = true;
+
+    var form = $("#report_concern_form")[0];
+    var email = $("#report_concern_form #email").val();
+    var subject = $("#report_concern_form #subject").val();
+    var message = $("#report_concern_form #message").val();
+
+    if ($("#report_concern_form #attachment")[0].files.length > 0) {
+      if ($("#report_concern_form #attachment")[0].files[0].size > 5250000) {
+        $("#report_concern_form .formResponse").html("File size too big.");
+        valid = false;
+        return;
+      }
+    }
+
+    if (!isEmail(email) && email != "") {
+      $("#report_concern_form .formResponse").html(
+        "Please enter a valid email."
+      );
+      valid = false;
+      return;
+    }
+
+    if (message == "" || subject == "") {
+      $("#report_concern_form .formResponse").html(
+        "Please fill in the required fields."
+      );
+      valid = false;
+      return;
+    }
+
+    if (valid) {
+      $("#report_concern_form button").prop("disabled", true);
+
+      var post_data = new FormData(form);
+
+      $.ajax({
+        type: "POST",
+        url: "../php/ajax/sendConcernForm.php",
+        data: post_data,
+        processData: false,
+        contentType: false,
+        cache: false,
+        success: function (data, textStatus, jqXHR) {
+          if (data == "success") {
+            $("#report_concern_form")[0].reset();
+            $("#report_concern_form .formResponse").html(
+              "Thank you for submitting your report."
+            );
+            $("#report_concern_form .formResponse").addClass("success");
+            $("#report_concern_form button").prop("disabled", false);
+          } else {
+            $("#report_concern_form .formResponse").html(data);
+            $("#report_concern_form button").prop("disabled", false);
+          }
+        },
+      });
+    }
+  });
+
+  $(document).on(
+    "click",
+    "#big_weekend_signup_form .gdprWrapper label",
+    function (e) {
+      $("#big_weekend_signup_form .gdprWrapper label").toggleClass("active");
+    }
+  );
+
+  //contact
+  $(document).on("submit", "#big_weekend_signup_form", function (e) {
+    e.preventDefault();
+    var valid = true;
+
+    var email = $("#big_weekend_signup_form #email").val();
+    var fname = $("#big_weekend_signup_form #fname").val();
+    var event = $("#big_weekend_signup_form #event").val();
+    var hear = $("#big_weekend_signup_form #hear").val();
+    var party = $("#big_weekend_signup_form #party").val();
+    var ages = [];
+    $("#big_weekend_signup_form input[name='ages']:checked").each(function () {
+      ages.push($(this).val());
+    });
+
+    var clubGDPRisChecked = $("#big_weekend_signup_form #clubGDPR").is(
+      ":checked"
+    );
+    if (!clubGDPRisChecked) {
+      clubGDPR = 0;
+    } else {
+      clubGDPR = 1;
+    }
+
+    var startArcheryGDPRisChecked = $(
+      "#big_weekend_signup_form #startArcheryGDPR"
+    ).is(":checked");
+    if (!startArcheryGDPRisChecked) {
+      startArcheryGDPR = 0;
+    } else {
+      startArcheryGDPR = 1;
+    }
+
+    //alert(clubGDPR);
+
+    if (!isEmail(email)) {
+      $("#big_weekend_signup_form .signupResponse").html(
+        "Please enter a valid email."
+      );
+      valid = false;
+      return;
+    }
+
+    if (fname == "" || event == "" || hear == "" || party == "" || ages == "") {
+      $("#big_weekend_signup_form .signupResponse").html(
+        "Please fill in the required fields."
+      );
+      valid = false;
+      return;
+    }
+
+    if (valid) {
+      $("#big_weekend_signup_form button").prop("disabled", true);
+
+      url = "../php/ajax/sendBigWeekendSignupForm.php";
+      url = encodeURI(url);
+
+      post_data = {
+        email: email,
+        fname: fname,
+        event: event,
+        hear: hear,
+        party: party,
+        ages: ages,
+        clubGDPR: clubGDPR,
+        startArcheryGDPR: startArcheryGDPR,
+      };
+
+      $.post(url, post_data, function (data) {
+        if (data == "success") {
+          $("#big_weekend_signup_form")[0].reset();
+          $("#big_weekend_signup_form .signupResponse").html(
+            "Thank you for signing up."
+          );
+          $("#big_weekend_signup_form .signupResponse").addClass("success");
+          $("#big_weekend_signup_form button").prop("disabled", false);
+        } else {
+          $("#big_weekend_signup_form .signupResponse").html(data);
+          $("#big_weekend_signup_form button").prop("disabled", false);
+        }
+      });
+    }
+  });
+
+  $(document).on(
+    "click",
+    "#footer_signup_form .gdprWrapper label",
+    function (e) {
+      $("#footer_signup_form .gdprWrapper label").toggleClass("active");
+    }
+  );
+
+  $(document).on("submit", "#footer_signup_form", function (e) {
+    e.preventDefault();
+    var valid = true;
+
+    var email = $("#footer_signup_form #email").val();
+
+    if (!isEmail(email)) {
+      $("#footer_signup_form .signupResponse").html(
+        "Please enter a valid email."
+      );
+      valid = false;
+      return;
+    }
+
+    var isChecked = $("#footer_signup_form #footerGDPR").is(":checked");
+    if (!isChecked) {
+      $("#footer_signup_form .signupResponse").html(
+        "Please check the box above to agree to being added to our mailing list."
+      );
+      valid = false;
+      return;
+    }
+
+    if (valid) {
+      $("#footer_signup_form button").prop("disabled", true);
+
+      url = "../php/ajax/sendSignupForm.php";
+      url = encodeURI(url);
+
+      post_data = {
+        email: email,
+      };
+
+      $.post(url, post_data, function (data) {
+        if (data == "success") {
+          $("#footer_signup_form")[0].reset();
+          $("#footer_signup_form .signupResponse").html(
+            "Thank you for signing up."
+          );
+          $("#footer_signup_form .signupResponse").addClass("success");
+          $("#footer_signup_form button").prop("disabled", false);
+        } else {
+          $("#footer_signup_form .signupResponse").html(data);
+          $("#footer_signup_form button").prop("disabled", false);
+        }
+      });
+    }
+  });
+
+  $(document).on(
+    "click",
+    "#email_signup_form .gdprWrapper label",
+    function (e) {
+      $("#email_signup_form .gdprWrapper label").toggleClass("active");
+    }
+  );
+
+  $(document).on("submit", "#email_signup_form", function (e) {
+    e.preventDefault();
+    var valid = true;
+
+    var email = $("#email_signup_form #email").val();
+
+    if (!isEmail(email)) {
+      $("#email_signup_form .signupResponse").html(
+        "Please enter a valid email."
+      );
+      valid = false;
+      return;
+    }
+
+    var isChecked = $("#email_signup_form #gdpr").is(":checked");
+    if (!isChecked) {
+      $("#email_signup_form .signupResponse").html(
+        "Please check the box above to agree to being added to our mailing list."
+      );
+      valid = false;
+      return;
+    }
+
+    if (valid) {
+      $("#email_signup_form button").prop("disabled", true);
+
+      url = "../php/ajax/sendSignupForm.php";
+      url = encodeURI(url);
+
+      post_data = {
+        email: email,
+      };
+
+      $.post(url, post_data, function (data) {
+        if (data == "success") {
+          $("#email_signup_form")[0].reset();
+          $("#email_signup_form .signupResponse").html(
+            "Thank you for signing up."
+          );
+          $("#email_signup_form .signupResponse").addClass("success");
+          $("#email_signup_form button").prop("disabled", false);
+        } else {
+          $("#email_signup_form .signupResponse").html(data);
+          $("#email_signup_form button").prop("disabled", false);
+        }
+      });
+    }
+  });
+
+  //accordion id's for cache
+  var count = 1;
+  $("button.accordion").each(function (e) {
+    $(this).attr("id", "accordion_" + count);
+    count++;
+  });
+
+  $(document).on("click", ".accordion", function (e) {
+    var acc = $(this);
+    var panel = acc.next(".panel");
+    var h = panel.children(".inner").outerHeight();
+
+    //console.log(h);
+
+    /*if(!acc.hasClass('active') && $('.accordion.active').length){
+			$('.accordion.active').removeClass('active');
+			$('.panel').css('max-height',0);
+		}*/
+
+    acc.toggleClass("active");
+
+    if (acc.hasClass("active")) {
+      panel.css("max-height", h);
+    } else {
+      panel.css("max-height", 0);
+    }
+  });
+
+  /* $(document).on("click", ".membershipTabs li", function (e) {
+    var tab = $(this);
+    var tableClass = tab.attr("data-table");
+    console.log(tableClass); // add this line to check the value of tableClass
+    var panel = tab.find("." + tableClass);
+    panel.addClass("active");
+
+
+		//$('.membershipTabs li.active').removeClass('active');
+
+    //tab.addClass("active");
+    //panel.addClass("active");
+
+  });*/
+
+  document.querySelectorAll(".membershipTabs li").forEach((tab) => {
+    tab.addEventListener("click", function () {
+      const tableClass = this.dataset.table;
+      const oneMembership = this.closest(".oneMembership");
+      const table = oneMembership.querySelector(`.${tableClass}`);
+      const activeTable = oneMembership.querySelector("div.active");
+      const activeTab = oneMembership.querySelector("li.active");
+      if (activeTab) {
+        activeTable.classList.remove("active");
+        activeTab.classList.remove("active");
+      }
+      this.classList.add("active");
+      table.classList.add("active");
+    });
+  });
+
+  $("#find_club").on("click", function (e) {
+    e.preventDefault();
+
+    var distance = $("select#distance").val();
+    var zipcode = $("#zipcode").val();
+    var type = $("select#type").val();
+    var valid = true;
+
+    if (zipcode == "") {
+      $("#zipcode").addClass("error");
+      valid = false;
+      return;
+    } else {
+      $("#zipcode").removeClass("error");
+    }
+
+    if (distance == "Select Distance") {
+      distance = 100;
+    }
+
+    if (type == "Select Type") {
+      type = "Default";
+    }
+
+    if (valid) {
+      searchClubs();
+      $("html, body").animate(
+        {
+          scrollTop: $(".mapSection").offset().top - 150,
+        },
+        300
+      );
+    }
+  });
+
+  $("#find_experiences").on("click", function (e) {
+    e.preventDefault();
+
+    var distance = $("select#distance").val();
+    var zipcode = $("#zipcode").val();
+    var valid = true;
+
+    if (zipcode == "") {
+      $("#zipcode").addClass("error");
+      valid = false;
+      return;
+    } else {
+      $("#zipcode").removeClass("error");
+    }
+
+    if (distance == "Select Distance") {
+      distance = 100;
+    }
+
+    if (valid) {
+      searchLocations();
+      $("html, body").animate(
+        {
+          scrollTop: $(".mapSection").offset().top - 150,
+        },
+        300
+      );
+    }
+  });
+
+  if ($("#map").length) {
+    //Initialise Map
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: new google.maps.LatLng(55, -3),
+      zoom: 6,
+    });
+    infoWindow = new google.maps.InfoWindow();
+    locationSelect = $("#locationSelect");
+  }
+
+  $(document).on("click", "#competition_table .link a", function (e) {
+    e.preventDefault();
+    var link = $(this);
+    var id = link.attr("id");
+    if (link.children("span").html() == "+") {
+      link.children("span").html("-");
+    } else {
+      link.children("span").html("+");
+    }
+    link
+      .parents("tr")
+      .siblings("#section-" + id)
+      .toggleClass("open");
+  });
+
+  checkPopup("signupOverlay");
+
+  $(document).on("click", ".closePopup", function (e) {
+    e.preventDefault();
+    closePopup();
+  });
+
+  $(document).on("click", ".popupOverlay", function (e) {
+    if ($(e.target).hasClass("popupOverlay")) {
+      closePopup();
+    }
+  });
+
+  //Signup popup
+  $(document).on("submit", "#popupSignupForm", function (e) {
+    e.preventDefault();
+
+    var valid = true;
+
+    var email = $("#popupSignupForm #email").val();
+
+    //console.log(email);
+
+    if (!isEmail(email)) {
+      $("#popupSignupForm .subscribeResponse").css("display", "block");
+      $("#popupSignupForm .subscribeResponse").html(
+        "Please enter a valid email."
+      );
+      valid = false;
+      return;
+    }
+
+    var isChecked = $("#popupSignupForm #popup_gdpr").is(":checked");
+    if (!isChecked) {
+      $("#popupSignupForm .subscribeResponse").html(
+        "Please check the box above to agree to being added to our mailing list."
+      );
+      valid = false;
+      return;
+    }
+
+    if (valid) {
+      $("#popupSignupForm button").html("Signing up...");
+      $("#popupSignupForm button").prop("disabled", true);
+
+      url = "../php/ajax/sendSignupForm.php";
+      url = encodeURI(url);
+
+      post_data = {
+        email: email,
+      };
+
+      $.post(url, post_data, function (data) {
+        if (data == "success") {
+          $("#popupSignupForm .subscribeResponse").css("display", "block");
+          $("#popupSignupForm .subscribeResponse").html(
+            "Thank you for signing up."
+          );
+          $("#popupSignupForm button").html("Thank You");
+          //send popup event using gtag.js
+          gtag("event", "popup_signup", {
+            event_category: "Signup",
+            event_action: "Submit",
+            event_label: "Popup Signup Form", // Name of your form.
+          });
+          createCookie("signupOverlayCookie", "on", 9999);
+        } else {
+          $("#popupSignupForm .subscribeResponse").css("display", "block");
+          $("#popupSignupForm .subscribeResponse").html(
+            "Please enter a valid email and accept our terms."
+          );
+          $("#popupSignupForm .subscribeResponse").fadeIn(500);
+        }
+      });
+    }
+  });
+
+  //filter events
+  $(document).on(
+    "submit",
+    "#zipcode_search_events, #event_name_search_events",
+    function (e) {
+      e.preventDefault();
+      $("#filter_events").trigger("click");
+    }
+  );
+
+  $(document).on("click", ".filterCompetitions", function (e) {
+    e.preventDefault();
+    var type = $("select#type").val();
+    var round_type = $("select#round_type").val();
+    var distance = $("select#distance").val();
+    var zipcode = $("#zipcode").val();
+    var page = 0;
+
+    if (type == "") {
+      //type = 0;
+    }
+
+    if (round_type == "") {
+      //round_type = 0;
+    }
+
+    if (zipcode == "") {
+      distance = 0;
+    }
+
+    //console.log(round_type);
+
+    $("#events_calendar_table").html(
+      '<tr class="titleRow"><td class="searchTitle" colspan="6"><h2>Loading...</h2></td></tr>'
+    );
+
+    url =
+      "../php/ajax/filterCompetitions.php?type=" +
+      type +
+      "&round_type=" +
+      round_type +
+      "&distance=" +
+      distance +
+      "&zipcode=" +
+      zipcode +
+      "&page=" +
+      page +
+      "&run=true";
+    url = encodeURI(url);
+
+    //console.log(url);
+
+    $.get(url, function (data) {
+      $(".eventsCalendarTable").html(data);
+      var hide = $("#hide").val();
+      if (hide == "hide") {
+        $(".loadMoreHolder").remove();
+      }
+    });
+  });
+
+  if ($("#events_calendar_table").length) {
+    $("#filter_events").click();
+  }
+
+  $(document).on("click", ".loadMoreEvents", function (e) {
+    e.preventDefault();
+    var type = $("select#type").val();
+    var round_type = $("select#round_type").val();
+    var distance = $("select#distance").val();
+    var zipcode = $("#zipcode").val();
+
+    if (type == "") {
+      //type = 0;
+    }
+
+    if (round_type == "") {
+      //round_type = 0;
+    }
+
+    if (zipcode == "") {
+      distance = 0;
+    }
+
+    var page = $(".loadMoreEvents").attr("data-page");
+
+    //$('.loadMoreHolder').html('<h2 class="loadingTitle">Loading...</h2>');
+
+    url =
+      "../php/ajax/filterCompetitions.php?type=" +
+      type +
+      "&round_type=" +
+      round_type +
+      "&distance=" +
+      distance +
+      "&zipcode=" +
+      zipcode +
+      "&page=" +
+      page +
+      "&run=true";
+    url = encodeURI(url);
+
+    $.get(url, function (data) {
+      $(".loadMoreHolder").remove();
+      var data_split = data.split("~~~~~");
+      console.log(data_split[0]);
+      $("#events_calendar_table").append(data_split[0]);
+      $(".eventsCalendarTable").append(data_split[1]);
+    });
+  });
+
+  //filter courses
+  $(document).on(
+    "submit",
+    "#zipcode_search_events, #event_name_search_events",
+    function (e) {
+      e.preventDefault();
+      $("#filter_courses").trigger("click");
+    }
+  );
+
+  $(document).on("click", ".filterCourses", function (e) {
+    e.preventDefault();
+    //var type = $("select#type").val();
+    var distance = $("select#distance").val();
+    var zipcode = $("#zipcode").val();
+    var event_name = $("#event_name").val();
+    var page = 0;
+
+    if (zipcode == "") {
+      distance = 0;
+    }
+
+    //console.log(round_type);
+
+    $("#courses_calendar_table").html(
+      '<tr class="titleRow"><td class="searchTitle" colspan="6"><h2>Loading...</h2></td></tr>'
+    );
+
+    url =
+      "../php/ajax/filterCourses.php?distance=" +
+      distance +
+      "&zipcode=" +
+      zipcode +
+      "&page=" +
+      page +
+      "&event_name=" +
+      event_name +
+      "&run=true";
+    url = encodeURI(url);
+
+    //console.log(url);
+
+    $.get(url, function (data) {
+      $(".coursesCalendarTable").html(data);
+      var hide = $("#hide").val();
+      if (hide == "hide") {
+        $(".loadMoreHolder").remove();
+      }
+    });
+  });
+
+  if ($("#courses_calendar_table").length) {
+    $("#filter_courses").click();
+  }
+
+  $(document).on("click", ".loadMoreCourses", function (e) {
+    e.preventDefault();
+    var distance = $("select#distance").val();
+    var zipcode = $("#zipcode").val();
+    var event_name = $("#event_name").val();
+
+    if (zipcode == "") {
+      distance = 0;
+    }
+
+    var page = $(".loadMoreCourses").attr("data-page");
+
+    //$('.loadMoreHolder').html('<h2 class="loadingTitle">Loading...</h2>');
+
+    url =
+      "../php/ajax/filterCourses.php?distance=" +
+      distance +
+      "&zipcode=" +
+      zipcode +
+      "&page=" +
+      page +
+      "&event_name=" +
+      event_name +
+      "&run=true";
+    url = encodeURI(url);
+
+    $.get(url, function (data) {
+      $(".loadMoreHolder").remove();
+      var data_split = data.split("~~~~~");
+      console.log(data_split[0]);
+      $("#courses_calendar_table").append(data_split[0]);
+      $(".coursesCalendarTable").append(data_split[1]);
+    });
+  });
+
+  $(document).on("click", ".searchLink", function (e) {
+    e.preventDefault();
+    $(this).toggleClass("close");
+    $(".searchBar").toggleClass("open");
+    if ($(".searchBar").hasClass("open")) {
+      setTimeout(function () {
+        //delay focus as makes page jump in safari
+        $(".searchBar input").focus();
+      }, 400);
+    }
+  });
+});
+//*-*-*-*-*-*-*-*-*-*-*-*
+//   END OF DOM READY
+//*-*-*-*-*-*-*-*-*-*-*-*
+
+$(window).on("load", function () {
+  loadVideosLater(); //here
+});
+
+$(window).on("resize, orientationchange", function () {});
+
+$(window).on("load resize orientationchange touchmove scroll", function () {
+  var windowBottom = $(this).scrollTop() + $(this).innerHeight();
+
+  $(".stat .number").each(function () {
+    var statNumber = $(this);
+    var objectBottom = statNumber.offset().top + 200;
+    if (objectBottom < windowBottom) {
+      if (!statNumber.hasClass("run")) {
+        setTimeout(function () {
+          var stat_id = statNumber.attr("id");
+          var stat_num = statNumber.data("num");
+          var stat_countup = new CountUp(stat_id, 0, stat_num, 0, 3);
+          stat_countup.start();
+        }, 0);
+        statNumber.addClass("run");
+      }
+    }
+  });
+});
+
+function toggleNav() {
+  var nav = $(".overlayNav");
+  var body = $("body");
+  $(".menuToggle").toggleClass("animate");
+  nav.toggleClass("open");
+  body.toggleClass("noscroll");
+  if (nav.hasClass("open")) {
+    $(".menuToggle span").html("CLOSE");
+  } else {
+    $(".secondaryNav").removeClass("open");
+    $(".overlayNav .main li a.expands.active").removeClass("active");
+    $(".menuToggle span").html("MENU");
+  }
+}
+
+function loadVideosLater() {
+  $(".videoHolder.loadLater video").each(function () {
+    $(this).attr("src", $(this).data("src"));
+    $(this)[0].play();
+    $(this).addClass("fadeIn");
+  });
+}
+
+function clearLocations() {
+  infoWindow.close();
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(null);
+  }
+  markers.length = 0;
+}
+
+function isEmail(email) {
+  var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+  return regex.test(email);
+}
+
+//cookies
+function checkCookies() {
+  var cookieState = readCookie("cookiecookie");
+  if (cookieState != "on") {
+    $(".cookieBar").addClass("show");
+  } else {
+    $(".cookieBar").removeClass("show");
+  }
+}
+
+function createCookie(name, value, days) {
+  if (days) {
+    var date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    var expires = "; expires=" + date.toGMTString();
+  } else var expires = "";
+  document.cookie = name + "=" + value + expires + "; path=/";
+}
+
+function readCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == " ") c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+}
+
+function eraseCookie(name) {
+  createCookie(name, "", -1);
+}
+
+//Start Google Maps Locator
+function searchClubs() {
+  var address = $("#zipcode").val();
+  var geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: address + ", UK" }, function (results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      searchClubsNear(results[0].geometry.location);
+    } else {
+      alert(address + " not found");
+    }
+  });
+}
+
+function searchLocations() {
+  var address = $("#zipcode").val();
+  var geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: address + ", UK" }, function (results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      searchLocationsNear(results[0].geometry.location);
+    } else {
+      alert(address + " not found");
+    }
+  });
+}
+
+function clearLocations() {
+  infoWindow.close();
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(null);
+  }
+  markers.length = 0;
+
+  locationSelect.innertHTML = "";
+  var option = document.createElement("option");
+  option.value = "none";
+  option.innerHTML = "See all results:";
+  locationSelect.append(option);
+}
+
+function searchClubsNear(center) {
+  clearLocations();
+
+  //radius
+  var radius = $("#distance").val();
+
+  if (radius == "Select Distance") {
+    radius = 100;
+  }
+
+  var type = $("select#type").val();
+
+  if (type == "Select Type") {
+    type = "Default";
+  }
+
+  var searchUrl =
+    "phpsqlsearch_clubs_genxml.php?lat=" +
+    center.lat() +
+    "&lng=" +
+    center.lng() +
+    "&radius=" +
+    radius +
+    "&type=" +
+    type;
+
+  //console.log(searchUrl);
+
+  var name = "";
+  var address = "";
+  var latlngSearch = new google.maps.LatLng(
+    parseFloat(center.lat()),
+    parseFloat(center.lng())
+  );
+
+  createMarker(latlngSearch, name, address, "default");
+
+  //console.log(searchUrl);
+
+  downloadUrl(searchUrl, function (data) {
+    //console.log(data);
+    var xml = parseXml(data);
+    var markerNodes = xml.documentElement.getElementsByTagName("marker");
+    var bounds = new google.maps.LatLngBounds();
+    $(".clubFinderResults").html("");
+
+    if (markerNodes.length == "") {
+      $(".clubFinderResults").html(
+        "<p class='noResults'>No results found. Please try a different search or increase the distance parameter.</p>"
+      );
+    }
+
+    for (var i = 0; i < markerNodes.length; i++) {
+      var name = markerNodes[i].getAttribute("name");
+      var addr_1 = markerNodes[i].getAttribute("addr_1");
+      var addr_2 = markerNodes[i].getAttribute("addr_2");
+      var addr_3 = markerNodes[i].getAttribute("addr_3");
+      var postcode = markerNodes[i].getAttribute("postcode");
+      var distance = parseFloat(markerNodes[i].getAttribute("distance"));
+      var telephone = markerNodes[i].getAttribute("telephone");
+      var email = markerNodes[i].getAttribute("email");
+      var url = markerNodes[i].getAttribute("url");
+      var marker_type = markerNodes[i].getAttribute("marker_type");
+      var latlng = new google.maps.LatLng(
+        parseFloat(markerNodes[i].getAttribute("lat")),
+        parseFloat(markerNodes[i].getAttribute("lng"))
+      );
+      var city = markerNodes[i].getAttribute("city");
+
+      createOption(name, distance, i);
+
+      var addr_html = addr_1 + ", ";
+
+      if (addr_2 != "") {
+        addr_html += addr_2 + ",</br>";
+      }
+
+      if (addr_3 != "") {
+        addr_html += addr_3 + ", ";
+      }
+
+      if (city != "") {
+        addr_html += city + ", ";
+      }
+
+      if (postcode != "") {
+        addr_html += postcode;
+      }
+
+      createMarker(latlng, name, addr_html, marker_type, telephone, email, url);
+      createClubMarkerInfo(
+        latlng,
+        name,
+        addr_1,
+        addr_2,
+        addr_3,
+        postcode,
+        email,
+        distance,
+        telephone,
+        url,
+        i,
+        marker_type,
+        city
+      );
+
+      bounds.extend(latlng);
+    }
+    map.fitBounds(bounds);
+    locationSelect.show();
+    locationSelect.onchange = function () {
+      var markerNum =
+        locationSelect.options[locationSelect.selectedIndex].value;
+      google.maps.event.trigger(markers[markerNum], "click");
+    };
+
+    map.setCenter(latlngSearch);
+    map.setZoom(8);
+  });
+}
+
+function downloadUrl(url, callback) {
+  var request = window.ActiveXObject
+    ? new ActiveXObject("Microsoft.XMLHTTP")
+    : new XMLHttpRequest();
+
+  request.onreadystatechange = function () {
+    if (request.readyState == 4) {
+      request.onreadystatechange = doNothing;
+      callback(request.responseText, request.status);
+    }
+  };
+
+  request.open("GET", url, true);
+  request.send(null);
+}
+
+function parseXml(str) {
+  if (window.ActiveXObject) {
+    var doc = new ActiveXObject("Microsoft.XMLDOM");
+    doc.loadXML(str);
+    return doc;
+  } else if (window.DOMParser) {
+    return new DOMParser().parseFromString(str, "text/xml");
+  }
+}
+
+function createOption(name, distance, num) {
+  var option = document.createElement("option");
+  option.value = num;
+  option.innerHTML = name + "(" + distance.toFixed(1) + ")";
+  locationSelect.append(option);
+}
+
+function createMarker(
+  latlng,
+  name,
+  address,
+  colour,
+  telephone,
+  email,
+  website
+) {
+  if (colour == "default") {
+    colour = "../images/icons/navy-marker.svg";
+    name = $("#zipcode").val().toUpperCase();
+  } else if (colour == "red") {
+    colour = "../images/icons/red-marker.svg";
+  }
+
+  var telephone_text = "";
+  var email_text = "";
+  var website_text = "";
+
+  if (telephone) {
+    telephone_text = "<br/>" + telephone;
+  }
+
+  if (email) {
+    email_text =
+      "<br/><a target='blank' href='mailto:" + email + "'>" + email + "</a>";
+  }
+
+  if (website) {
+    if (website && !website.match(/^http([s]?):\/\/.*/)) {
+      website = "http://" + website;
+    }
+    website_text =
+      "<br/><a target='blank' href='" + website + "'>" + website + "</a>";
+  }
+
+  var html =
+    "<b>" +
+    name +
+    "</b> <br/>" +
+    address +
+    email_text +
+    website_text +
+    telephone_text;
+  var marker = new google.maps.Marker({
+    map: map,
+    position: latlng,
+    icon: colour,
+  });
+  google.maps.event.addListener(marker, "click", function () {
+    infoWindow.setContent(html);
+    infoWindow.open(map, marker);
+  });
+  markers.push(marker);
+}
+
+function createClubMarkerInfo(
+  latlng,
+  name,
+  addr_1,
+  addr_2,
+  addr_3,
+  postcode,
+  email,
+  distance,
+  telephone,
+  url,
+  count,
+  colour,
+  city
+) {
+  //address = textareaToSpaces(address);
+
+  var storeLocatorHTML = "";
+  var email_html = "";
+  var website_html = "";
+  var tel_html = "";
+  var addr_html = addr_1 + "<br/>";
+
+  if (email != "") {
+    email_html =
+      '<img class="email" src="/images/icons/email.svg" alt="" /> <a href="mailto:' +
+      email +
+      '"><span>' +
+      email +
+      "</span></a><br />";
+  }
+
+  if (telephone != "") {
+    tel_html =
+      '<img src="/images/icons/phone.svg" alt="" /> <span>' +
+      telephone +
+      "</span><br />";
+  }
+
+  if (url != "") {
+    if (url && !url.match(/^http([s]?):\/\/.*/)) {
+      url = "http://" + url;
+    }
+
+    website_html =
+      '<img src="/images/icons/website.svg" alt="" /> <a href="' +
+      url +
+      '" target="_blank"><span>Visit Website</span></a><br /><a href="' +
+      url +
+      '" target="_blank" class="button teal">Contact</a>';
+  }
+
+  if (addr_2 != "") {
+    addr_html += addr_2 + "<br/>";
+  }
+
+  if (addr_3 != "") {
+    addr_html += addr_3 + "<br/>";
+  }
+
+  if (city != "") {
+    addr_html += city + "<br/>";
+  }
+
+  if (postcode != "") {
+    addr_html += postcode;
+  }
+
+  distance = distance.toFixed(1);
+
+  storeLocatorHTML =
+    '<div class="oneResult oneClubResult">' +
+    "<h3>" +
+    name +
+    "</h3>" +
+    "<h4><small>" +
+    distance +
+    " miles away</small></h4>" +
+    '<div class="info">' +
+    '<img src="/images/icons/address.svg" alt="" /> <span class="address">' +
+    addr_html +
+    "</span>" +
+    tel_html +
+    email_html +
+    website_html +
+    "</div>" +
+    "</div>";
+
+  $(".clubFinderResults").append(storeLocatorHTML);
+}
+
+function textareaToSpaces(str) {
+  var breakTag = " ";
+  return (str + "").replace(
+    /([^>\r\n]?)(\r\n|\n\r|\r|\n)/g,
+    "$1" + breakTag + "$2"
+  );
+}
+
+function doNothing() {}
+//End Google Maps Locator
+
+function openPopup(type) {
+  if ($(".popupOverlay." + type).length) {
+    $(".popupOverlay." + type).addClass("open");
+  }
+}
+
+function checkPopup(type) {
+  setTimeout(function () {
+    var cookieState = readCookie(type + "Cookie");
+    if (cookieState != "on") {
+      openPopup(type);
+    }
+  }, 3000);
+}
+
+function closePopup() {
+  if ($(".popupOverlay.open").hasClass("signupOverlay")) {
+    createCookie("signupOverlayCookie", "on", 2);
+  }
+  $(".popupOverlay").removeClass("open");
+}

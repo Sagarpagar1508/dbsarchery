@@ -1,0 +1,61 @@
+<div class="container" style="background-color: #e7eef4;">
+    <h1 class="text-center pt-5"><b>Appointment</b></h1>
+    <!-- Page heading -->
+    <div class="row mb-4">
+  
+      <div class="col-sm-12 col-md-12 col-lg-12 text-center p-5" style="box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+  
+        
+        <form [formGroup]="form" (ngSubmit)="send()">
+          <div class="row">
+            <div class="col-lg-6 mb-3">
+              <label for="from_name">Your Name</label>
+              <input formControlName="from_name" type="text" class="form-control" id="from_name">
+              <div *ngIf="form.get('from_name')?.invalid && form.get('from_name')?.touched" class="text-danger">
+                <div *ngIf="form.get('from_name')?.errors?.['required']">Your name is required.</div>
+              </div>
+            </div>
+            <div class="col-lg-6 mb-3">
+              <label for="from_Number">Mobile Number</label>
+              <input formControlName="from_Number" type="text" class="form-control" id="from_Number">
+              <div *ngIf="form.get('from_Number')?.invalid && form.get('from_Number')?.touched" class="text-danger">
+                <div *ngIf="form.get('from_Number')?.errors?.['required']">Mobile number is required.</div>
+                <div *ngIf="form.get('from_Number')?.errors?.['pattern']">Enter a valid mobile number.</div>
+              </div>
+            </div>
+            <div class="col-lg-6 mb-3">
+              <label for="date">Date</label>
+              <input formControlName="date" type="date" class="form-control" id="date">
+              <div *ngIf="form.get('date')?.invalid && form.get('date')?.touched" class="text-danger">
+                <div *ngIf="form.get('date')?.errors?.['required']">Date is required.</div>
+              </div>
+            </div>
+            <div class="col-lg-6 mb-3">
+              <label for="query">Query</label>
+              <select formControlName="query" class="form-select" id="query">
+                <option value="">Select Your Query</option>
+                <option value="Enquiry">Enquiry</option>
+                <option value="Trainer">Trainer</option>
+                <option value="Other">Other</option>
+              </select>
+              <div *ngIf="form.get('query')?.invalid && form.get('query')?.touched" class="text-danger">
+                <div *ngIf="form.get('query')?.errors?.['required']">Query is required.</div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="message">Write Message</label>
+              <textarea formControlName="message" class="form-control" id="message" style="height: 100px;"></textarea>
+              <div *ngIf="form.get('message')?.invalid && form.get('message')?.touched" class="text-danger">
+                <div *ngIf="form.get('message')?.errors?.['required']">Message is required.</div>
+              </div>
+            </div>
+        
+            <div class="mt-3 ">
+              <button type="submit" class="mx-4 px-2 btn btn-warning ">Send Message</button>
+              <button routerLink="/coach_page" class="mx-4 px-2 btn btn-warning"> Close</button>
+            </div>
+          </div>
+        </form>
+        
+      </div>
+    </div>

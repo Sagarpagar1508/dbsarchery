@@ -1,0 +1,53 @@
+.nav-item li {
+    list-style: none;
+    cursor: pointer;
+    padding: 8px 0;
+    position: relative;
+    font-weight: 400;
+    transition-property: scale;
+    transition-duration: 0.4s;
+  }
+  
+  .nav-item li:hover {
+    /* scale: 1.1; */
+    color: #ee641a;
+  }
+  
+  .nav-item li::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0;
+    height: 2px;
+    background-color: #ee641a;
+    transition: width 0.3s ease;
+  }
+  
+  .nav-item li.active {
+    color: #ee641a;
+  }
+  
+  .nav-item li.active::after {
+    /* width: 100%; */
+  }
+
+  .contact-info{
+   
+    li{
+        list-style: none;
+        display: flex;
+        unicode-bidi: isolate;
+        line-height: 35px;
+        /* font-size: 500; */
+    }
+    i{
+        margin-right: 4%;
+        margin-top: 10px;
+        /* font-size:550;
+        font-weight: 600; */
+
+         /* display: block;
+        unicode-bidi: isolate-override; */
+    }
+  }

@@ -1,0 +1,172 @@
+.profile-container {
+    width: 85%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: #212121;
+    color: #fff;
+    flex-wrap: wrap; /* Added for responsiveness */
+}
+
+.player-photo {
+    width: 250px;
+    height: 270px;
+    border-radius: 50%;
+    margin-right: 20px;
+    /* object-fit: cover;        */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.player-info {
+    flex-grow: 2;
+    padding-left: 20px;
+}
+
+.player-name {
+    font-size: 26px;
+    margin: 0;
+}
+
+.player-awards {
+    font-size: 18px;
+    margin: 10px 0 0;
+}
+
+.social-icons {
+    display: flex;
+    gap: 10px;
+    padding: 2px;
+    font-size: 1.5rem;
+    margin-top: 10px;
+    text-align: right;
+}
+
+.about-coach {
+    padding: 20px;
+}
+
+.about-coach h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.about-coach p {
+    line-height: 1.6;
+    font-size: 19px;
+   
+    font-weight: 400;
+    text-align: justify;
+}
+
+.profile-gallery {
+    padding: 20px;
+}
+
+.profile-gallery h2 {
+    margin: 0 0 20px;
+    text-align: center;
+    font-size: 24px;
+}
+
+.gallery-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.gallery-photo {
+    width: calc(25% - 15px);
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* transition: transform 0.3s, box-shadow 0.3s; */
+}
+
+.gallery-photo:hover {
+    /* transform: scale(1.05); */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .player-photo {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .player-info {
+        padding-left: 0;
+    }
+
+    .social-icons {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .player-photo {
+        width: 120px;
+        height: 120px;
+    }
+
+    .player-name {
+        font-size: 20px;
+    }
+
+    .player-awards {
+        font-size: 14px;
+    }
+
+    .social-icons {
+        font-size: 1.2rem;
+    }
+
+    .gallery-photo {
+        width: calc(50% - 15px);
+    }
+}
+
+
+.gallery-photo {
+    width: calc(50% - 15px);
+    height: 250px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* transition: transform 0.3s, box-shadow 0.3s; */
+}
+
+.gallery-photo:hover {
+    /* transform: scale(1.05); */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .gallery-photo {
+        width: calc(33.333% - 15px); /* 3 images per row */
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-photo {
+        width: calc(100% - 15px); /* 1 image per row */
+    }
+}

@@ -1,0 +1,63 @@
+.pb-5 {
+    padding-bottom: 5rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.p-2 {
+    padding: 2rem;
+}
+
+.profile-gallery {
+    margin-top: 20px;
+}
+
+.gallery-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.gallery-photo {
+    width: auto;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: transform 0.9s;
+    margin-top: 20px;
+}
+
+.gallery-photo:hover {
+    transform: scale(1.03);
+}
+
+/* Media queries for responsive design */
+
+@media (max-width: 1200px) {
+    .gallery-photo {
+        height: 250px;
+    }
+}
+
+@media (max-width: 992px) {
+    .gallery-photo {
+        height: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .gallery-photo {
+        height: 180px;
+    }
+}
+
+@media (max-width: 576px) {
+    .gallery-photo {
+        height: 150px;
+        margin-top: 10px;
+    }
+}
